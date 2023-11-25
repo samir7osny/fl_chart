@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fl_chart/src/chart/base/base_chart/base_chart_painter.dart';
@@ -97,6 +98,13 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
 
     var tempAngle = data.startDegreeOffset;
 
+    final transformationMatrix = Matrix4.identity()
+      ..translate(center.dx, center.dy)
+      ..rotateY(10 * (pi / 180))
+      ..rotateX(50 * (pi / 180))
+      // ..scale(2.0, 3)
+      ..translate(-center.dx, -center.dy);
+
     /// Paint the shadows
     for (var i = 0; i < data.sections.length; i++) {
       final section = data.sections[i];
@@ -122,7 +130,8 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
         centerRadius,
       );
 
-      drawSectionShadow(section, sectionPath, canvasWrapper);
+      drawSectionShadow(section,
+          sectionPath.transform(transformationMatrix.storage), canvasWrapper);
       tempAngle += sectionDegree;
     }
 
@@ -174,8 +183,13 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
         centerRadius,
       );
 
-      drawSection(section, sectionPath, canvasWrapper);
-      drawSectionStroke(section, sectionPath, canvasWrapper, viewSize);
+      drawSection(section, sectionPath.transform(transformationMatrix.storage),
+          canvasWrapper);
+      drawSectionStroke(
+          section,
+          sectionPath.transform(transformationMatrix.storage),
+          canvasWrapper,
+          viewSize);
       tempAngle += sectionDegree;
     }
   }
